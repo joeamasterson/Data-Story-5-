@@ -1,0 +1,216 @@
+---
+title: "data_story_5"
+author: "Joe Masterson"
+date: "2026-04-21"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(flexdashboard)
+library(tidyverse)
+library(janitor)
+library(plotly)
+library(knitr)
+library(kableExtra)
+
+survey <- read_csv("survey_data.csv") %>%
+  clean_names()
+
+# make sure numeric columns are numeric
+survey <- survey %>%
+  mutate(
+    age = as.numeric(age),
+    siblings = as.numeric(siblings),
+    pets = as.numeric(pets),
+    sleep_hours = as.numeric(sleep_hours),
+    streaming_hours = as.numeric(streaming_hours)
+  )
+
+n_responses <- nrow(survey)
+avg_age <- round(mean(survey$age, na.rm = TRUE), 1)
+avg_sleep <- round(mean(survey$sleep_hours, na.rm = TRUE), 1)
+avg_stream <- round(mean(survey$streaming_hours, na.rm = TRUE), 1)
+avg_siblings <- round(mean(survey$siblings, na.rm = TRUE), 1)
+avg_pets <- round(mean(survey$pets, na.rm = TRUE), 1)
+
+
+```
+
+# Key Results
+
+## Top Right Corner
+
+### How many people took the Survey?
+
+```{r,echo=FALSE}
+valueBox(n_responses, caption = "How many people took the Survey? ")
+```
+
+### Average Age
+
+```{r,echo=FALSE}
+valueBox(
+  value = paste0(round(mean(survey$age, na.rm = TRUE), 1), " yrs"),
+  caption = "Average Age of the People in the Survey",
+  color = "info",
+)
+```
+
+### How many hours of Sleep for a Sewanee Student?
+
+```{r,echo=FALSE}
+valueBox(
+  value = paste0(round(mean(survey$sleep_hours, na.rm = TRUE), 1), " hrs"),
+  caption = "Average Hours of Sleep for a Sewanee Student",
+  color = "success",
+)
+```
+
+### Siblings
+
+```{r,echo=FALSE}
+valueBox(
+  value = round(mean(survey$siblings, na.rm = TRUE), 1),
+  caption = "Average Number of Siblings for a Sewanee Student",
+  color = "warning",
+)
+```
+
+## Bottom Right Corner
+
+### What kind of Music do Sewanee Student Listen To?
+
+```{r,echo=FALSE}
+music_plot <- survey %>%
+  count(music_genre, sort = TRUE) %>%
+  ggplot(aes(x = reorder(music_genre, n), y = n)) +
+  geom_col(fill = "navy", width = 0.5) +
+  geom_text(aes(label = n), 
+            hjust = 1.2, 
+            color = "white", 
+            size = 3.5) +
+  coord_flip() +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+  labs(title = "Favorite Music Genres for Sewanee Students") +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.title = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold", size = 16)
+  )
+
+music_plot
+
+```
+
+### Summary
+
+This dataset provides insight into the daily habits and preferences of Sewanee students, focusing on sleep, social media usage, streaming, and personal interests. The findings reveal consistent patterns in how students spend their time, along with distinct preferences in music and lifestyle choices, offering a snapshot of student behavior on campus.
+
+# Map Section
+
+### Here are the cities that Sewanee Students want to visit
+
+```{r,echo=FALSE}
+library(leaflet)
+library(tidygeocoder)
+library(dplyr)
+
+dream_data <- survey %>%
+  filter(!is.na(dream_city), dream_city != "") %>%
+  select(dream_city) %>%
+  mutate(
+    dream_city = case_when(
+      dream_city == "St. Petersburg" ~ "St. Petersburg, Russia",
+      dream_city == "Melbourne" ~ "Melbourne, Australia",
+      dream_city == "Sydney" ~ "Sydney, Australia",
+      dream_city == "Auckland" ~ "Auckland, New Zealand",
+      dream_city == "Miami" ~ "Miami, Florida, USA",
+      dream_city == "Las Vegas" ~ "Las Vegas, Nevada, USA",
+      dream_city == "Medellan" ~ "Medellin, Colombia",
+      TRUE ~ dream_city
+    )
+  )
+
+dream_geo <- dream_data %>%
+  geocode(dream_city, method = "osm", lat = lat, long = lon)
+
+dream_counts <- dream_geo %>%
+  count(dream_city, lat, lon)
+
+leaflet(dream_counts) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~lon,
+    lat = ~lat,
+    radius = ~3 + n,
+    color = "navy",
+    fillColor = "navy",
+    fillOpacity = 0.7,
+    stroke = FALSE,
+    popup = ~paste0("<b>", dream_city, "</b><br>Responses: ", n)
+  )
+
+```
+
+# Sleep Patterns
+
+## Top Left Corner
+
+### Sleep vs Streaming
+```{r,echo=FALSE}
+sleep_stream_plot <- survey %>%
+  mutate(
+    sleep_hours = as.numeric(sleep_hours),
+    streaming_hours = as.numeric(streaming_hours)
+  ) %>%
+  group_by(streaming_hours) %>%
+  summarize(avg_sleep = mean(sleep_hours, na.rm = TRUE)) %>%
+  ggplot(aes(x = streaming_hours, y = avg_sleep)) +
+  geom_line(color = "steelblue", linewidth = 1.2) +
+  geom_point(size = 3, color = "steelblue") +
+  labs(
+    title = "Average Sleep by Streaming Hours",
+    x = "Streaming Hours per Day",
+    y = "Average Sleep (Hours)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold"))
+
+sleep_stream_plot
+```
+*Caption: Average sleep varies with streaming time, showing a general upward trend, though results may be influenced by a small sample size.*
+ 
+
+## Top Right Corner
+
+### Sleep vs Age
+
+```{r,echo=FALSE}
+age_sleep_plot <- survey %>%
+  mutate(
+    age = as.numeric(age),
+    sleep_hours = as.numeric(sleep_hours)
+  ) %>%
+  group_by(age) %>%
+  summarize(avg_sleep = mean(sleep_hours, na.rm = TRUE)) %>%
+  ggplot(aes(x = age, y = avg_sleep)) +
+  geom_line(color = "darkgreen", linewidth = 1.2) +
+  geom_point(size = 3, color = "darkgreen") +
+  labs(
+    title = "Average Sleep by Age",
+    x = "Age",
+    y = "Average Sleep (Hours)"
+  ) +
+  theme_minimal(base_size = 14)
+
+age_sleep_plot
+```
+*Caption: The graph shows that average sleep among Sewanee students varies slightly by age but remains relatively consistent overall. Most age groups report around 8 hours of sleep, with a noticeable dip at age 20 and a peak around age 23. While there is a small increase in sleep for older students, the pattern is not perfectly linear, suggesting that factors other than age such as lifestyle, workload, and personal habits play a larger role.*

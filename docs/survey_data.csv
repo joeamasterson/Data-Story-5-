@@ -1,0 +1,17 @@
+"name","age","siblings","pets","location","climate","sport","school_year","favorite_food","social_media","sleep_hours","music_genre","dream_city","streaming_hours"
+"KT ",20,1,2,"Williamsburg, VA","Hot","Football","Junior","Sushi","Other",7,"Pop","St. Petersburg ",3.5
+"Natalie",18,1,0,"Los Angeles","Moderate","Baseball","Freshman","French Fries","Instagram",8,"Rap","Melbourne",2
+"Turner",20,2,3,"Houston, TX","Hot","Football","Sophomore","Fried Chicken","Instagram",8,"Country","Las Vegas ",1
+"Payton",20,1,1,"Columbia","Hot","Football","Junior","Pasta","TikTok",7,"Country","Sydney",1
+"Jack S",22,2,0,"Saint Simons ","Hot","Other","Senior","Pasta","Instagram",8,"Hip-Hop","Auckland",4
+"Luka",22,1,1,"Charlotte","Hot","Football","Senior","Pizza","Instagram",8,"Other","Miami",2
+"MC",22,1,1,"Monteagle","Hot","Football","Senior","Mexican","X",6,"Other","Medellan",0
+"Maggie ",25,2,0,"San Francisco","Moderate","Other","Other","Asian","Instagram",8,"Pop","Budapest",2
+"Miller",19,2,0,"Dallas","Hot","Football","Freshman","Asian","Snapchat",8,"Hip-Hop","Rome",2
+"Merritt",23,2,3,"Atlanta","Hot","Soccer","Senior","Sushi","Instagram",8,"Country","London",2
+"Elizabeth",19,1,1,"Charlottesville","Moderate","Other","Freshman","Cheese","TikTok",8,"Country","Sydney",2
+"Joe Masterson",23,2,0,"Chicago","Cold","Golf","Senior","Pasta","Snapchat",11,"Country","Budapest",2
+"Gabe",23,1,2,"Auburn","Hot","Baseball","Senior","Mexican","X",8,"Country","Paris",4
+"Elias",22,8,2,"Mexico City","Hot","Football","Freshman","Street Tacos","Instagram",8,"Pop","Casablanca",2
+"Teddy",22,3,2,"Ponte Vedra","Hot","Golf","Senior","Pizza","TikTok",12,"Country","Lisbon",9
+"Colin",18,2,1,"Atlanta","Hot","Football","Senior","Cheeseburger","TikTok",8,"Rap","Berlin",4
